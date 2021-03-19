@@ -117,7 +117,9 @@ class App extends Component {
             // It also accepts the `user`, since signing out needs the user's token
             <SignOut msgAlert={this.msgAlert} clearUser={this.clearUser} user={user} />
           )} />
+          {/* Similar to the /sign-out AuthenticatedRoute, except the path is /change-password. */}
           <AuthenticatedRoute user={user} path='/change-password' render={() => (
+            // It takes the user prop, since it needs to know whose password to change.
             <ChangePassword msgAlert={this.msgAlert} user={user} />
           )} />
         </main>

@@ -48,6 +48,9 @@ export const signOut = user => {
   })
 }
 
+// changePassword accepts two parameters.
+// A passwords object with an oldPassword and newPassword property and the user,
+// needed for their token.
 export const changePassword = (passwords, user) => {
   return axios({
     url: apiUrl + '/change-password',
