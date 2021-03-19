@@ -1,7 +1,9 @@
 // Import React, so we can use JSX. Also import Component for our class component
 import React, { Component, Fragment } from 'react'
+
 // Import Route from react-router for our SignIn and SignUp components
 import { Route } from 'react-router-dom'
+
 // Import the v4 function from the `uuid` package. Rename the `v4` function to
 // be `uuid` (as uuid)
 import { v4 as uuid } from 'uuid'
@@ -9,8 +11,10 @@ import { v4 as uuid } from 'uuid'
 // This is a route we can only go to if we are signed in. Otherwise, it send us to
 // the root path "/"
 import AuthenticatedRoute from './components/AuthenticatedRoute/AuthenticatedRoute'
+
 // A component to show a user a message. Then dismiss that message after 5 seconds
 import AutoDismissAlert from './components/AutoDismissAlert/AutoDismissAlert'
+
 // The header component has our navigation links to different pages
 import Header from './components/Header/Header'
 
@@ -20,10 +24,14 @@ import SignIn from './components/SignIn/SignIn'
 import SignOut from './components/SignOut/SignOut'
 import ChangePassword from './components/ChangePassword/ChangePassword'
 
+// Import our movie crud components
+import MovieIndex from './components/MovieIndex/MovieIndex'
+import MovieCreate from './components/MovieCreate/MovieCreate'
+import MovieShow from './components/MovieShow/MovieShow'
+
 class App extends Component {
   constructor (props) {
     super(props)
-
     // Set the initial state of our App to be a user that starts as `null` (until we've signed in)
     // and an array of messages to show the user (initially empty)
     this.state = {
@@ -31,13 +39,10 @@ class App extends Component {
       msgAlerts: []
     }
   }
-
   // this method will set the user state, to the user passed as a parameter
   setUser = user => this.setState({ user })
-
   // this method will reset the user state, to its inital value of null
   clearUser = () => this.setState({ user: null })
-
   // remove an alert from our `msgAlerts` state
   // the `id` is the unique id of the msg we want to remove
   deleteAlert = (id) => {
@@ -47,7 +52,6 @@ class App extends Component {
       return { msgAlerts: state.msgAlerts.filter(msg => msg.id !== id) }
     })
   }
-
   // show a message to our user
   // heading - the title of the message
   // message - the body of the message
@@ -56,30 +60,25 @@ class App extends Component {
   msgAlert = ({ heading, message, variant }) => {
     // create a unique id for this message
     const id = uuid()
-
     // set the `msgAlerts` state, so that it contains a new message with the properties
     // of `heading`, `message`, `variant`, and `id`
     this.setState((state) => {
       // Bad don't do. Because this modifies state directly.
       // this.state.msgAlerts.push({ heading, message, variant, id })
       // return { msgAlerts: this.state.msgAlerts }
-
       // the reason we are using this syntax instead of `push` is so that we never
       // modify the `msgAlerts` state directly
       const newMsgAlerts = [...state.msgAlerts, { heading, message, variant, id }]
       return { msgAlerts: newMsgAlerts }
     })
   }
-
   render () {
     // destructure the msgAlerts and user state
     const { msgAlerts, user } = this.state
-
     return (
       <Fragment>
         {/* This is the top bar with our navigation links */}
         <Header user={user} />
-
         {/* For each of our messages in msgAlerts: show an AutoDismissAlert
             component. Which will show up on the screen and disappear after 5
             seconds. */}
@@ -117,15 +116,25 @@ class App extends Component {
             // It also accepts the `user`, since signing out needs the user's token
             <SignOut msgAlert={this.msgAlert} clearUser={this.clearUser} user={user} />
           )} />
-          {/* Similar to the /sign-out AuthenticatedRoute, except the path is /change-password. */}
+          {/* Similar to the /sign-out AuthenticatedRoute, except the path is /change-password */}
           <AuthenticatedRoute user={user} path='/change-password' render={() => (
-            // It takes the user prop, since it needs to know whose password to change.
+            /* It takes the user as a prop, since it needs to know whose password to change */
             <ChangePassword msgAlert={this.msgAlert} user={user} />
+          )} />
+          {/* Add an authenticated route to see all movies */}
+          <AuthenticatedRoute user={user} exact path='/movies' render={() => (
+            <MovieIndex msgAlert={this.msgAlert} user={user} />
+          )} />
+          {/* An authenticated route to create a movie */}
+          <AuthenticatedRoute user={user} exact path='/movies-create' render={() => (
+            <MovieCreate msgAlert={this.msgAlert} user={user} />
+          )} />
+          <AuthenticatedRoute user={user} exact path='/movies/:id' render={() => (
+            <MovieShow msgAlert={this.msgAlert} user={user} />
           )} />
         </main>
       </Fragment>
     )
   }
 }
-
 export default App
